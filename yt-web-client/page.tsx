@@ -1,6 +1,8 @@
 import styles from "./page.module.css";
+import { getVideos } from './firebase/functions'
 
 export default function Home() {
+  await getVideos();
   return (
     <main className={styles.main}>
       <div className={styles.description}>
