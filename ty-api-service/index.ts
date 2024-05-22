@@ -18,3 +18,29 @@ export const createUser = functions.auth.user().onCreate((user) => {
   logger.info(`User Created: ${JSON.stringify(userInfo)}`);
   return;
 });
+
+export const generateUploadUrl = onCall({maxInstances: 1 }, async (request) => { 
+  if(!request.auth) {
+    throw new functions.https:HttpsError(
+      "failed-precondition",
+      "The function must be called while authenticated."
+    ); 
+  }
+
+  const auth = request.auth;
+  const data = request.data;
+  const bucket = storage.bucket(rawVideoBucket);
+
+  const fileName = `${auth.uid}-${Date.now()}.${data.fileExtension}`;
+
+
+
+  const [url] = await bucket.file(fileName).getSignedUrl({
+    version: "v4",
+    action: "write",
+    expires: Date.now() + 15 * 60 * 1000, //15min
+  });
+
+  return {url, fileName};
+
+}); 
