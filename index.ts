@@ -24,6 +24,19 @@ app.post('/process-video', async (req, res) => {
 
   const inputFileName = data.name;
   const outputFileName = `processed-${inputFileName}`;
+  const videoId = inputFile.split('.')[0];
+
+
+if(isVideoNew()) {
+  return res.status(400).send('Bad Request: video already processing or processed');
+} else {
+  await setVideo(videoId, {
+    id: videoId,
+    uid: videoId.split("-")[0],
+    status: "processing"
+  });
+}
+
 
   //download the raw video from cloud stoarage
   await downloadRawVideo(inputFileName);
@@ -42,6 +55,11 @@ app.post('/process-video', async (req, res) => {
 
   //upload the processed video to cloud storage
   await uploadProcessedVideo(outputFileName);
+
+  await setVideo(videoId, {
+    status: "processed",
+    filename: outputFileName
+  });
   
   await Promise.all([
     deleteRawVideo(inputFileName),
