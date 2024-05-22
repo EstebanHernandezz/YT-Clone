@@ -1,4 +1,5 @@
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { functions } from './firebase';
 
 const functions = getFunctions();
 
